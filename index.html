@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>�n T?p To�n 5</title>
+  <title>Ôn Tập Toán 5</title>
   <!-- React & ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Babel d? d?ch JSX -->
+  <!-- Babel để dịch JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -83,7 +83,7 @@
             const correctNum = int * den + num;
             const q = {
               id: Math.random(),
-              question: `H?n s? ${int} ${num}/${den} du?c vi?t du?i d?ng ph�n s? l�:`,
+              question: `Hỗn số ${int} ${num}/${den} được viết dưới dạng phân số là:`,
               options: shuffleArray([`${correctNum}/${den}`, `${int*den}/${num}`, `${correctNum}/${int}`, `${num}/${den}`]),
               correct: 0
             };
@@ -93,19 +93,19 @@
           () => {
             const num = getRandomInt(1, 9);
             const den = Math.random() > 0.5 ? 10 : 100;
-            return createQuestion(`Ph�n s? ${num}/${den} vi?t du?i d?ng s? th?p ph�n l�:`, num / den, 'float');
+            return createQuestion(`Phân số ${num}/${den} viết dưới dạng số thập phân là:`, num / den, 'float');
           },
           () => {
             const den = getRandomInt(2, 9);
             const n1 = getRandomInt(1, den - 1);
             const n2 = getRandomInt(1, den - 1);
-            return createQuestion(`T�m x bi?t: x - ${formatNum(n1/10)} = ${formatNum(n2/10)}`, parseFloat(((n1+n2)/10).toFixed(1)), 'float');
+            return createQuestion(`Tìm x biết: x - ${formatNum(n1/10)} = ${formatNum(n2/10)}`, parseFloat(((n1+n2)/10).toFixed(1)), 'float');
           },
           () => {
             const total = getRandomInt(10, 50) * 10;
             const part = getRandomInt(1, 9);
             const val = (total * part) / 10;
-            return createQuestion(`L?p 5A c� ${total} h?c sinh. S? h?c sinh gi?i chi?m ${part}/10 s? h?c sinh c? l?p. H?i l?p 5A c� bao nhi�u h?c sinh gi?i?`, val, 'int', 'h?c sinh');
+            return createQuestion(`Lớp 5A có ${total} học sinh. Số học sinh giỏi chiếm ${part}/10 số học sinh cả lớp. Hỏi lớp 5A có bao nhiêu học sinh giỏi?`, val, 'int', 'học sinh');
           }
         ];
         const qs = [];
@@ -122,18 +122,18 @@
             const c = getRandomInt(0, 9);
             const q = {
               id: Math.random(),
-              question: `Trong s? th?p ph�n 1${a},${b}${c}5, ch? s? ${c} thu?c h�ng n�o?`,
-              options: shuffleArray(["H�ng ph?n mu?i", "H�ng ph?n tram", "H�ng ph?n ngh�n", "H�ng don v?"]),
+              question: `Trong số thập phân 1${a},${b}${c}5, chữ số ${c} thuộc hàng nào?`,
+              options: shuffleArray(["Hàng phần mười", "Hàng phần trăm", "Hàng phần nghìn", "Hàng đơn vị"]),
               correct: 0
             };
-            q.correct = q.options.indexOf("H�ng ph?n tram");
+            q.correct = q.options.indexOf("Hàng phần trăm");
             qs.push(q);
           } else if (type === 2) {
             const base = getRandomFloat(10, 50, 1);
             const target = parseFloat((base + 0.1).toFixed(1));
             const q = {
               id: Math.random(),
-              question: `S? n�o du?i d�y l?n hon ${formatNum(base)}?`,
+              question: `Số nào dưới đây lớn hơn ${formatNum(base)}?`,
               options: shuffleArray([formatNum(target), formatNum(base - 0.1), formatNum(base - 1), formatNum(base)]),
               correct: 0
             };
@@ -141,11 +141,11 @@
             qs.push(q);
           } else if (type === 3) {
             const num = getRandomFloat(10, 99, 2);
-            qs.push(createQuestion(`L�m tr�n s? ${formatNum(num)} d?n h�ng don v? ta du?c:`, Math.round(num), 'int'));
+            qs.push(createQuestion(`Làm tròn số ${formatNum(num)} đến hàng đơn vị ta được:`, Math.round(num), 'int'));
           } else {
             const m = getRandomInt(2, 9);
             const cm = getRandomInt(10, 99);
-            qs.push(createQuestion(`${m}m ${cm}cm vi?t du?i d?ng s? th?p ph�n l� ... m`, m + cm/100, 'float', 'm'));
+            qs.push(createQuestion(`${m}m ${cm}cm viết dưới dạng số thập phân là ... m`, m + cm/100, 'float', 'm'));
           }
         }
         return qs;
@@ -163,16 +163,16 @@
           else {
             const res = getRandomFloat(2, 10, 1);
             const div = getRandomInt(2, 5);
-            qs.push(createQuestion(`K?t qu? ph�p t�nh: ${formatNum(parseFloat((res*div).toFixed(2)))} : ${div} = ?`, res, 'float'));
+            qs.push(createQuestion(`Kết quả phép tính: ${formatNum(parseFloat((res*div).toFixed(2)))} : ${div} = ?`, res, 'float'));
             continue;
           }
           ans = parseFloat(ans.toFixed(2));
           if (Math.random() < 0.3) {
             const price = getRandomInt(10, 50) * 1000;
             const qty = getRandomFloat(1.5, 5, 1);
-            qs.push(createQuestion(`Mua ${formatNum(qty)} kg g?o gi� ${formatNum(price)} d?ng/kg h?t bao nhi�u ti?n?`, price * qty, 'int', 'd?ng'));
+            qs.push(createQuestion(`Mua ${formatNum(qty)} kg gạo giá ${formatNum(price)} đồng/kg hết bao nhiêu tiền?`, price * qty, 'int', 'đồng'));
           } else {
-            qs.push(createQuestion(`T�nh: ${formatNum(a)} ${label} ${formatNum(b)} = ?`, ans, 'float'));
+            qs.push(createQuestion(`Tính: ${formatNum(a)} ${label} ${formatNum(b)} = ?`, ans, 'float'));
           }
         }
         return qs;
@@ -184,16 +184,16 @@
           if (type === 1) {
             const a = getRandomFloat(5, 20, 1);
             const h = getRandomFloat(5, 15, 1);
-            qs.push(createQuestion(`T�nh di?n t�ch h�nh tam gi�c c� d�y ${formatNum(a)}cm v� chi?u cao ${formatNum(h)}cm.`, parseFloat(((a*h)/2).toFixed(2)), 'float', 'cm�'));
+            qs.push(createQuestion(`Tính diện tích hình tam giác có đáy ${formatNum(a)}cm và chiều cao ${formatNum(h)}cm.`, parseFloat(((a*h)/2).toFixed(2)), 'float', 'cm²'));
           } else if (type === 2) {
             const r = getRandomInt(2, 10);
-            if (Math.random() > 0.5) qs.push(createQuestion(`Di?n t�ch h�nh tr�n c� b�n k�nh r = ${r}cm l�:`, parseFloat((r*r*3.14).toFixed(2)), 'float', 'cm�'));
-            else qs.push(createQuestion(`Chu vi h�nh tr�n c� du?ng k�nh d = ${r*2}cm l�:`, parseFloat((r*2*3.14).toFixed(2)), 'float', 'cm'));
+            if (Math.random() > 0.5) qs.push(createQuestion(`Diện tích hình tròn có bán kính r = ${r}cm là:`, parseFloat((r*r*3.14).toFixed(2)), 'float', 'cm²'));
+            else qs.push(createQuestion(`Chu vi hình tròn có đường kính d = ${r*2}cm là:`, parseFloat((r*2*3.14).toFixed(2)), 'float', 'cm'));
           } else {
             const a = getRandomInt(10, 20);
             const b = getRandomInt(5, 9);
             const h = getRandomInt(5, 10);
-            qs.push(createQuestion(`H�nh thang c� d�y l?n ${a}m, d�y b� ${b}m, chi?u cao ${h}m. Di?n t�ch l�:`, ((a+b)*h)/2, 'float', 'm�'));
+            qs.push(createQuestion(`Hình thang có đáy lớn ${a}m, đáy bé ${b}m, chiều cao ${h}m. Diện tích là:`, ((a+b)*h)/2, 'float', 'm²'));
           }
         }
         return qs;
@@ -204,15 +204,15 @@
           const st = getRandomInt(1, 3);
           if (st === 1) {
             const a = getRandomInt(1, 10) * 5;
-            qs.push(createQuestion(`T? s? ph?n tram c?a ${a} v� 100 l�:`, a, 'int', '%'));
+            qs.push(createQuestion(`Tỉ số phần trăm của ${a} và 100 là:`, a, 'int', '%'));
           } else if (st === 2) {
             const total = getRandomInt(10, 100) * 10;
             const pct = getRandomInt(1, 9) * 10;
-            qs.push(createQuestion(`T�m ${pct}% c?a ${total}kg:`, (total*pct)/100, 'float', 'kg'));
+            qs.push(createQuestion(`Tìm ${pct}% của ${total}kg:`, (total*pct)/100, 'float', 'kg'));
           } else {
             const price = getRandomInt(50, 200) * 1000;
             const disc = getRandomInt(1, 5) * 10;
-            qs.push(createQuestion(`M?t chi?c �o gi� ${formatNum(price)} d?ng du?c gi?m gi� ${disc}%. S? ti?n du?c gi?m l�:`, (price*disc)/100, 'int', 'd?ng'));
+            qs.push(createQuestion(`Một chiếc áo giá ${formatNum(price)} đồng được giảm giá ${disc}%. Số tiền được giảm là:`, (price*disc)/100, 'int', 'đồng'));
           }
         }
         return qs;
@@ -223,9 +223,9 @@
           const k = getRandomInt(1, 3);
           const v = getRandomInt(30, 60);
           const t = getRandomInt(2, 5);
-          if (k === 1) qs.push(createQuestion(`M?t � t� di v?i v?n t?c ${v} km/h trong ${t} gi?. Qu�ng du?ng di du?c l�:`, v*t, 'int', 'km'));
-          else if (k === 2) qs.push(createQuestion(`Xe m�y di qu�ng du?ng ${v*t} km h?t ${t} gi?. V?n t?c c?a xe l�:`, v, 'int', 'km/h'));
-          else qs.push(createQuestion(`�i qu�ng du?ng ${v*t} km v?i v?n t?c ${v} km/h h?t bao l�u?`, t, 'int', 'gi?'));
+          if (k === 1) qs.push(createQuestion(`Một ô tô đi với vận tốc ${v} km/h trong ${t} giờ. Quãng đường đi được là:`, v*t, 'int', 'km'));
+          else if (k === 2) qs.push(createQuestion(`Xe máy đi quãng đường ${v*t} km hết ${t} giờ. Vận tốc của xe là:`, v, 'int', 'km/h'));
+          else qs.push(createQuestion(`Đi quãng đường ${v*t} km với vận tốc ${v} km/h hết bao lâu?`, t, 'int', 'giờ'));
         }
         return qs;
       }
@@ -234,78 +234,78 @@
     const CHAPTER_CONTENT = {
       chuong1: {
         id: 'chuong1',
-        title: '�n t?p Ph�n s? & H?n s?',
-        icon: '1??',
-        desc: 'Ph�n s? th?p ph�n, h?n s?, chuy?n d?i v� t�nh to�n.',
+        title: 'Ôn tập Phân số & Hỗn số',
+        icon: '1️⃣',
+        desc: 'Phân số thập phân, hỗn số, chuyển đổi và tính toán.',
         theory: [
-          { type: 'header', content: '1. Ph�n s? th?p ph�n' },
-          { type: 'text', content: 'C�c ph�n s? c� m?u s? l� 10, 100, 1000... du?c g?i l� ph�n s? th?p ph�n.' },
-          { type: 'example', content: 'V� d?: 3/10; 5/100; 17/1000 l� c�c ph�n s? th?p ph�n.' },
-          { type: 'header', content: '2. H?n s?' },
-          { type: 'box', content: 'H?n s? g?m hai ph?n: Ph?n nguy�n v� Ph?n ph�n s?.\nPh?n ph�n s? c?a h?n s? bao gi? cung b� hon 1.' },
-          { type: 'header', content: '3. Chuy?n h?n s? th�nh ph�n s?' },
-          { type: 'text', content: 'Ta l?y ph?n nguy�n nh�n v?i m?u s? r?i c?ng v?i t? s? (d? l�m t? s? m?i), gi? nguy�n m?u s?.' },
+          { type: 'header', content: '1. Phân số thập phân' },
+          { type: 'text', content: 'Các phân số có mẫu số là 10, 100, 1000... được gọi là phân số thập phân.' },
+          { type: 'example', content: 'Ví dụ: 3/10; 5/100; 17/1000 là các phân số thập phân.' },
+          { type: 'header', content: '2. Hỗn số' },
+          { type: 'box', content: 'Hỗn số gồm hai phần: Phần nguyên và Phần phân số.\nPhần phân số của hỗn số bao giờ cũng bé hơn 1.' },
+          { type: 'header', content: '3. Chuyển hỗn số thành phân số' },
+          { type: 'text', content: 'Ta lấy phần nguyên nhân với mẫu số rồi cộng với tử số (để làm tử số mới), giữ nguyên mẫu số.' },
           { type: 'example', content: '2 1/3 = (2 x 3 + 1)/3 = 7/3' }
         ]
       },
       chuong2: {
         id: 'chuong2',
-        title: 'S? th?p ph�n & So s�nh',
-        icon: '2??',
-        desc: 'Kh�i ni?m, h�ng s?, d?c vi?t v� so s�nh.',
+        title: 'Số thập phân & So sánh',
+        icon: '2️⃣',
+        desc: 'Khái niệm, hàng số, đọc viết và so sánh.',
         theory: [
-          { type: 'header', content: '1. Kh�i ni?m' },
-          { type: 'text', content: 'M?i s? th?p ph�n g?m hai ph?n: ph?n nguy�n v� ph?n th?p ph�n, ngan c�ch b?i d?u ph?y.' },
-          { type: 'example', content: '8,56: Ph?n nguy�n l� 8, ph?n th?p ph�n l� 56.' },
-          { type: 'header', content: '2. So s�nh' },
-          { type: 'box', content: 'So s�nh ph?n nguy�n tru?c. N?u b?ng nhau, so s�nh h�ng ph?n mu?i, ph?n tram...' }
+          { type: 'header', content: '1. Khái niệm' },
+          { type: 'text', content: 'Mỗi số thập phân gồm hai phần: phần nguyên và phần thập phân, ngăn cách bởi dấu phẩy.' },
+          { type: 'example', content: '8,56: Phần nguyên là 8, phần thập phân là 56.' },
+          { type: 'header', content: '2. So sánh' },
+          { type: 'box', content: 'So sánh phần nguyên trước. Nếu bằng nhau, so sánh hàng phần mười, phần trăm...' }
         ]
       },
       chuong3: {
         id: 'chuong3',
-        title: 'C�c ph�p t�nh s? th?p ph�n',
-        icon: '3??',
-        desc: 'C?ng, tr?, nh�n, chia s? th?p ph�n.',
+        title: 'Các phép tính số thập phân',
+        icon: '3️⃣',
+        desc: 'Cộng, trừ, nhân, chia số thập phân.',
         theory: [
-          { type: 'header', content: '1. C?ng, tr?' },
-          { type: 'box', content: '�?t t�nh sao cho c�c d?u ph?y th?ng c?t.' },
-          { type: 'header', content: '2. Nh�n, Chia' },
-          { type: 'text', content: '�?m ch? s? th?p ph�n khi nh�n. D?i d?u ph?y khi chia.' }
+          { type: 'header', content: '1. Cộng, trừ' },
+          { type: 'box', content: 'Đặt tính sao cho các dấu phẩy thẳng cột.' },
+          { type: 'header', content: '2. Nhân, Chia' },
+          { type: 'text', content: 'Đếm chữ số thập phân khi nhân. Dời dấu phẩy khi chia.' }
         ]
       },
       chuong4: {
         id: 'chuong4',
-        title: 'H�nh h?c ph?ng',
-        icon: '4??',
-        desc: 'Di?n t�ch Tam gi�c, H�nh thang, H�nh tr�n.',
+        title: 'Hình học phẳng',
+        icon: '4️⃣',
+        desc: 'Diện tích Tam giác, Hình thang, Hình tròn.',
         theory: [
-          { type: 'header', content: '1. Tam gi�c & H�nh thang' },
-          { type: 'box', content: 'S_tam_gi�c = (a x h) : 2\nS_h�nh_thang = (a + b) x h : 2' },
-          { type: 'header', content: '2. H�nh tr�n' },
+          { type: 'header', content: '1. Tam giác & Hình thang' },
+          { type: 'box', content: 'S_tam_giác = (a x h) : 2\nS_hình_thang = (a + b) x h : 2' },
+          { type: 'header', content: '2. Hình tròn' },
           { type: 'box', content: 'C = d x 3,14\nS = r x r x 3,14' }
         ]
       },
       chuong5: {
         id: 'chuong5',
-        title: 'T? s? ph?n tram',
-        icon: '5??',
-        desc: 'Gi?i to�n v? t? s? ph?n tram.',
+        title: 'Tỉ số phần trăm',
+        icon: '5️⃣',
+        desc: 'Giải toán về tỉ số phần trăm.',
         theory: [
-          { type: 'header', content: '1. T�m t? s? %' },
-          { type: 'text', content: 'T�m thuong hai s? -> Nh�n v?i 100 v� th�m %.' },
-          { type: 'header', content: '2. T�m gi� tr? %' },
-          { type: 'text', content: 'Mu?n t�m a% c?a B: L?y B x a : 100.' }
+          { type: 'header', content: '1. Tìm tỉ số %' },
+          { type: 'text', content: 'Tìm thương hai số -> Nhân với 100 và thêm %.' },
+          { type: 'header', content: '2. Tìm giá trị %' },
+          { type: 'text', content: 'Muốn tìm a% của B: Lấy B x a : 100.' }
         ]
       },
       chuong6: {
         id: 'chuong6',
-        title: 'To�n chuy?n d?ng d?u',
-        icon: '6??',
-        desc: 'V?n t?c (v), Qu�ng du?ng (s), Th?i gian (t).',
+        title: 'Toán chuyển động đều',
+        icon: '6️⃣',
+        desc: 'Vận tốc (v), Quãng đường (s), Thời gian (t).',
         theory: [
-          { type: 'header', content: '1. C�ng th?c' },
+          { type: 'header', content: '1. Công thức' },
           { type: 'box', content: 'v = s : t\ns = v x t\nt = s : v' },
-          { type: 'text', content: 'Luu �: C�c don v? do ph?i tuong ?ng.' }
+          { type: 'text', content: 'Lưu ý: Các đơn vị đo phải tương ứng.' }
         ]
       }
     };
@@ -313,8 +313,8 @@
     // --- COMPONENTS ---
     const Navbar = ({ goHome }) => (
       <nav style={{ background: 'linear-gradient(to right, #0284c7, #0ea5e9)', padding: '15px 20px', position: 'sticky', top: 0, zIndex: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-        <div onClick={goHome} style={{ color: 'white', fontWeight: 'bold', fontSize: '1.4rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}><span>??</span> L?p H?c To�n 5</div>
-        <button onClick={goHome} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>V? Trang Ch?</button>
+        <div onClick={goHome} style={{ color: 'white', fontWeight: 'bold', fontSize: '1.4rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}><span>🏫</span> Lớp Học Toán 5</div>
+        <button onClick={goHome} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>Về Trang Chủ</button>
       </nav>
     );
 
@@ -335,12 +335,12 @@
           {chapter.theory.map((item, index) => {
             if (item.type === 'header') return <h2 key={index} style={{ color: '#0369a1', marginTop: '25px', borderLeft: '5px solid #0ea5e9', paddingLeft: '15px' }}>{item.content}</h2>;
             if (item.type === 'box') return <div key={index} style={{ background: '#ecfccb', border: '2px solid #84cc16', borderRadius: '10px', padding: '15px', margin: '20px 0', whiteSpace: 'pre-line', color: '#4d7c0f', fontWeight: 'bold' }}>{item.content}</div>;
-            if (item.type === 'example') return <div key={index} style={{ background: '#eff6ff', borderLeft: '4px solid #3b82f6', padding: '15px', margin: '15px 0', fontStyle: 'italic', color: '#1e40af' }}><strong>V� d?:</strong> {item.content}</div>;
+            if (item.type === 'example') return <div key={index} style={{ background: '#eff6ff', borderLeft: '4px solid #3b82f6', padding: '15px', margin: '15px 0', fontStyle: 'italic', color: '#1e40af' }}><strong>Ví dụ:</strong> {item.content}</div>;
             return <p key={index} style={{ lineHeight: '1.6', fontSize: '1.1rem', marginBottom: '15px', color: '#334155' }}>{item.content}</p>;
           })}
         </div>
         <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <button onClick={onStartQuiz} style={{ background: 'linear-gradient(to right, #f59e0b, #ea580c)', color: 'white', border: 'none', padding: '15px 50px', fontSize: '1.3rem', fontWeight: 'bold', borderRadius: '50px', cursor: 'pointer', boxShadow: '0 4px 15px rgba(234, 88, 12, 0.4)' }}>B?t d?u �n t?p ngay ??</button>
+          <button onClick={onStartQuiz} style={{ background: 'linear-gradient(to right, #f59e0b, #ea580c)', color: 'white', border: 'none', padding: '15px 50px', fontSize: '1.3rem', fontWeight: 'bold', borderRadius: '50px', cursor: 'pointer', boxShadow: '0 4px 15px rgba(234, 88, 12, 0.4)' }}>Bắt đầu ôn tập ngay 🚀</button>
         </div>
       </div>
     );
@@ -353,8 +353,8 @@
       return (
         <div style={{ maxWidth: '800px', margin: '30px auto', padding: '20px' }}>
           <div style={{ background: '#fff', padding: '20px', borderRadius: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '20px', borderLeft: '10px solid #7c3aed' }}>
-            <h2 style={{ margin: 0, color: '#4b5563' }}>?? B�i t?p: {title}</h2>
-            <p style={{ margin: '10px 0 0', color: '#6b7280' }}>�? b�i du?c sinh ng?u nhi�n. H�y l�m th?t k? nh�!</p>
+            <h2 style={{ margin: 0, color: '#4b5563' }}>📝 Bài tập: {title}</h2>
+            <p style={{ margin: '10px 0 0', color: '#6b7280' }}>Đề bài được sinh ngẫu nhiên. Hãy làm thật kỹ nhé!</p>
           </div>
           {questions.map((q, idx) => {
             const isCorrect = userAnswers[q.id] === q.correct;
@@ -362,7 +362,7 @@
             const border = submitted ? (isCorrect ? '2px solid #22c55e' : '2px solid #ef4444') : '1px solid #e5e7eb';
             return (
               <div key={q.id} style={{ background: bg, padding: '20px', borderRadius: '12px', marginBottom: '20px', border, boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                <h3 style={{ marginTop: 0, color: '#1f2937' }}>C�u {idx + 1}: {q.question}</h3>
+                <h3 style={{ marginTop: 0, color: '#1f2937' }}>Câu {idx + 1}: {q.question}</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '15px' }}>
                   {q.options.map((opt, optIdx) => (
                     <label key={optIdx} style={{ display: 'flex', alignItems: 'center', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb', cursor: submitted ? 'default' : 'pointer', background: userAnswers[q.id] === optIdx ? '#e0f2fe' : 'transparent', fontWeight: userAnswers[q.id] === optIdx ? 'bold' : 'normal' }}>
@@ -376,11 +376,11 @@
           })}
           <div style={{ textAlign: 'center', marginTop: '40px', paddingBottom: '50px' }}>
             {!submitted ? (
-              <button onClick={() => setSubmitted(true)} disabled={Object.keys(userAnswers).length < 10} style={{ background: Object.keys(userAnswers).length < 10 ? '#cbd5e1' : '#7c3aed', color: 'white', border: 'none', padding: '15px 40px', fontSize: '1.2rem', fontWeight: 'bold', borderRadius: '10px', cursor: Object.keys(userAnswers).length < 10 ? 'not-allowed' : 'pointer' }}>{Object.keys(userAnswers).length < 10 ? `L�m ${Object.keys(userAnswers).length}/10 c�u` : 'N?p b�i ngay'}</button>
+              <button onClick={() => setSubmitted(true)} disabled={Object.keys(userAnswers).length < 10} style={{ background: Object.keys(userAnswers).length < 10 ? '#cbd5e1' : '#7c3aed', color: 'white', border: 'none', padding: '15px 40px', fontSize: '1.2rem', fontWeight: 'bold', borderRadius: '10px', cursor: Object.keys(userAnswers).length < 10 ? 'not-allowed' : 'pointer' }}>{Object.keys(userAnswers).length < 10 ? `Làm ${Object.keys(userAnswers).length}/10 câu` : 'Nộp bài ngay'}</button>
             ) : (
               <div style={{ background: 'white', padding: '30px', borderRadius: '15px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
-                <h2 style={{ fontSize: '2rem', color: '#7c3aed', margin: '0 0 10px 0' }}>K?t qu?: {score}/10</h2>
-                <button onClick={onRetry} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#7c3aed', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Ch?n chuong kh�c</button>
+                <h2 style={{ fontSize: '2rem', color: '#7c3aed', margin: '0 0 10px 0' }}>Kết quả: {score}/10</h2>
+                <button onClick={onRetry} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#7c3aed', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Chọn chương khác</button>
               </div>
             )}
           </div>
@@ -410,8 +410,8 @@
             {!activeChapter ? (
               <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '0 20px' }}>
                 <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-                  <h1 style={{ color: '#0f172a', fontSize: '2.5rem', marginBottom: '15px' }}>H? th?ng �n t?p To�n L?p 5</h1>
-                  <p style={{ color: '#64748b', fontSize: '1.2rem' }}>B�m s�t chuong tr�nh s�ch gi�o khoa "K?t n?i tri th?c"</p>
+                  <h1 style={{ color: '#0f172a', fontSize: '2.5rem', marginBottom: '15px' }}>Hệ thống ôn tập Toán Lớp 5</h1>
+                  <p style={{ color: '#64748b', fontSize: '1.2rem' }}>Bám sát chương trình sách giáo khoa "Kết nối tri thức"</p>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '25px' }}>
                   {Object.values(CHAPTER_CONTENT).map(chapter => (
@@ -426,7 +426,7 @@
             )}
           </main>
           <footer style={{ backgroundColor: '#1e293b', color: '#94a3b8', textAlign: 'center', padding: '25px' }}>
-            <p style={{ fontWeight: 'bold', color: 'white' }}>� 2024 L?p H?c To�n 5</p>
+            <p style={{ fontWeight: 'bold', color: 'white' }}>© 2026 Lớp Học Toán 5</p>
           </footer>
         </div>
       );
