@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ôn T?p Toán 5</title>
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel d? d?ch JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Nunito', sans-serif; margin: 0; background-color: #f0f9ff; box-sizing: border-box; }
+    * { box-sizing: border-box; }
+    button:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // --- UTILS ---
+    const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const getRandomFloat = (min, max, decimals = 1) => parseFloat((Math.random() * (max - min) + min).toFixed(decimals));
+    const formatNum = (num) => num.toString().replace('.', ',');
+    const shuffleArray = (array) => {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    };
+
+    const generateOptions = (correctVal, type = 'int', unit = '') => {
+      const options = new Set();
+      options.add(formatNum(correctVal) + (unit ? ` ${unit}` : ''));
+      let attempts = 0;
+      while (options.size < 4 && attempts < 20) {
+        let wrongVal;
+        if (type === 'int') {
+          const offset = getRandomInt(1, 10) * (Math.random() > 0.5 ? 1 : -1);
+          wrongVal = correctVal + offset;
+        } else {
+          const offset = getRandomFloat(0.1, 5, 1) * (Math.random() > 0.5 ? 1 : -1);
+          wrongVal = parseFloat((correctVal + offset).toFixed(type === 'float' ? 1 : 2));
+        }
+        if (Math.random() < 0.3) wrongVal = correctVal * 10;
+        else if (Math.random() < 0.3) wrongVal = correctVal / 10;
+        if (wrongVal > 0) options.add(formatNum(wrongVal) + (unit ? ` ${unit}` : ''));
+        attempts++;
+      }
+      while (options.size < 4) {
+        const r = type === 'int' ? getRandomInt(1, 100) : getRandomFloat(1, 100);
+        options.add(formatNum(r) + (unit ? ` ${unit}` : ''));
+      }
+      return shuffleArray(Array.from(options));
+    };
+
+    const createQuestion = (question, correctVal, type = 'int', unit = '') => {
+      const options = generateOptions(correctVal, type, unit);
+      const correctStr = formatNum(correctVal) + (unit ? ` ${unit}` : '');
+      return {
+        id: Math.random(),
+        question,
+        options,
+        correct: options.indexOf(correctStr)
+      };
+    };
+
+    // --- GENERATORS ---
+    const Generators = {
+      chuong1: () => {
+        const types = [
+          () => {
+            const int = getRandomInt(1, 5);
+            const num = getRandomInt(1, 4);
+            const den = getRandomInt(num + 1, 9);
+            const correctNum = int * den + num;
+            const q = {
+              id: Math.random(),
+              question: `H?n s? ${int} ${num}/${den} du?c vi?t du?i d?ng phân s? là:`,
+              options: shuffleArray([`${correctNum}/${den}`, `${int*den}/${num}`, `${correctNum}/${int}`, `${num}/${den}`]),
+              correct: 0
+            };
+            q.correct = q.options.indexOf(`${correctNum}/${den}`);
+            return q;
+          },
+          () => {
+            const num = getRandomInt(1, 9);
+            const den = Math.random() > 0.5 ? 10 : 100;
+            return createQuestion(`Phân s? ${num}/${den} vi?t du?i d?ng s? th?p phân là:`, num / den, 'float');
+          },
+          () => {
+            const den = getRandomInt(2, 9);
+            const n1 = getRandomInt(1, den - 1);
+            const n2 = getRandomInt(1, den - 1);
+            return createQuestion(`Tìm x bi?t: x - ${formatNum(n1/10)} = ${formatNum(n2/10)}`, parseFloat(((n1+n2)/10).toFixed(1)), 'float');
+          },
+          () => {
+            const total = getRandomInt(10, 50) * 10;
+            const part = getRandomInt(1, 9);
+            const val = (total * part) / 10;
+            return createQuestion(`L?p 5A có ${total} h?c sinh. S? h?c sinh gi?i chi?m ${part}/10 s? h?c sinh c? l?p. H?i l?p 5A có bao nhiêu h?c sinh gi?i?`, val, 'int', 'h?c sinh');
+          }
+        ];
+        const qs = [];
+        for(let i=0; i<10; i++) qs.push(types[getRandomInt(0, 3)]());
+        return qs;
+      },
+      chuong2: () => {
+        const qs = [];
+        for (let i = 0; i < 10; i++) {
+          const type = getRandomInt(1, 4);
+          if (type === 1) {
+            const a = getRandomInt(1, 9);
+            const b = getRandomInt(0, 9);
+            const c = getRandomInt(0, 9);
+            const q = {
+              id: Math.random(),
+              question: `Trong s? th?p phân 1${a},${b}${c}5, ch? s? ${c} thu?c hàng nào?`,
+              options: shuffleArray(["Hàng ph?n mu?i", "Hàng ph?n tram", "Hàng ph?n nghìn", "Hàng don v?"]),
+              correct: 0
+            };
+            q.correct = q.options.indexOf("Hàng ph?n tram");
+            qs.push(q);
+          } else if (type === 2) {
+            const base = getRandomFloat(10, 50, 1);
+            const target = parseFloat((base + 0.1).toFixed(1));
+            const q = {
+              id: Math.random(),
+              question: `S? nào du?i dây l?n hon ${formatNum(base)}?`,
+              options: shuffleArray([formatNum(target), formatNum(base - 0.1), formatNum(base - 1), formatNum(base)]),
+              correct: 0
+            };
+            q.correct = q.options.indexOf(formatNum(target));
+            qs.push(q);
+          } else if (type === 3) {
+            const num = getRandomFloat(10, 99, 2);
+            qs.push(createQuestion(`Làm tròn s? ${formatNum(num)} d?n hàng don v? ta du?c:`, Math.round(num), 'int'));
+          } else {
+            const m = getRandomInt(2, 9);
+            const cm = getRandomInt(10, 99);
+            qs.push(createQuestion(`${m}m ${cm}cm vi?t du?i d?ng s? th?p phân là ... m`, m + cm/100, 'float', 'm'));
+          }
+        }
+        return qs;
+      },
+      chuong3: () => {
+        const qs = [];
+        for(let i=0; i<10; i++) {
+          const op = getRandomInt(1, 4);
+          const a = getRandomFloat(10, 50, 1);
+          const b = getRandomFloat(1, 9, 1);
+          let ans = 0, label = "";
+          if (op === 1) { label = "+"; ans = a + b; }
+          else if (op === 2) { label = "-"; ans = a - b; }
+          else if (op === 3) { label = "x"; ans = a * b; }
+          else {
+            const res = getRandomFloat(2, 10, 1);
+            const div = getRandomInt(2, 5);
+            qs.push(createQuestion(`K?t qu? phép tính: ${formatNum(parseFloat((res*div).toFixed(2)))} : ${div} = ?`, res, 'float'));
+            continue;
+          }
+          ans = parseFloat(ans.toFixed(2));
+          if (Math.random() < 0.3) {
+            const price = getRandomInt(10, 50) * 1000;
+            const qty = getRandomFloat(1.5, 5, 1);
+            qs.push(createQuestion(`Mua ${formatNum(qty)} kg g?o giá ${formatNum(price)} d?ng/kg h?t bao nhiêu ti?n?`, price * qty, 'int', 'd?ng'));
+          } else {
+            qs.push(createQuestion(`Tính: ${formatNum(a)} ${label} ${formatNum(b)} = ?`, ans, 'float'));
+          }
+        }
+        return qs;
+      },
+      chuong4: () => {
+        const qs = [];
+        for(let i=0; i<10; i++) {
+          const type = getRandomInt(1, 3);
+          if (type === 1) {
+            const a = getRandomFloat(5, 20, 1);
+            const h = getRandomFloat(5, 15, 1);
+            qs.push(createQuestion(`Tính di?n tích hình tam giác có dáy ${formatNum(a)}cm và chi?u cao ${formatNum(h)}cm.`, parseFloat(((a*h)/2).toFixed(2)), 'float', 'cm²'));
+          } else if (type === 2) {
+            const r = getRandomInt(2, 10);
+            if (Math.random() > 0.5) qs.push(createQuestion(`Di?n tích hình tròn có bán kính r = ${r}cm là:`, parseFloat((r*r*3.14).toFixed(2)), 'float', 'cm²'));
+            else qs.push(createQuestion(`Chu vi hình tròn có du?ng kính d = ${r*2}cm là:`, parseFloat((r*2*3.14).toFixed(2)), 'float', 'cm'));
+          } else {
+            const a = getRandomInt(10, 20);
+            const b = getRandomInt(5, 9);
+            const h = getRandomInt(5, 10);
+            qs.push(createQuestion(`Hình thang có dáy l?n ${a}m, dáy bé ${b}m, chi?u cao ${h}m. Di?n tích là:`, ((a+b)*h)/2, 'float', 'm²'));
+          }
+        }
+        return qs;
+      },
+      chuong5: () => {
+        const qs = [];
+        for(let i=0; i<10; i++) {
+          const st = getRandomInt(1, 3);
+          if (st === 1) {
+            const a = getRandomInt(1, 10) * 5;
+            qs.push(createQuestion(`T? s? ph?n tram c?a ${a} và 100 là:`, a, 'int', '%'));
+          } else if (st === 2) {
+            const total = getRandomInt(10, 100) * 10;
+            const pct = getRandomInt(1, 9) * 10;
+            qs.push(createQuestion(`Tìm ${pct}% c?a ${total}kg:`, (total*pct)/100, 'float', 'kg'));
+          } else {
+            const price = getRandomInt(50, 200) * 1000;
+            const disc = getRandomInt(1, 5) * 10;
+            qs.push(createQuestion(`M?t chi?c áo giá ${formatNum(price)} d?ng du?c gi?m giá ${disc}%. S? ti?n du?c gi?m là:`, (price*disc)/100, 'int', 'd?ng'));
+          }
+        }
+        return qs;
+      },
+      chuong6: () => {
+        const qs = [];
+        for(let i=0; i<10; i++) {
+          const k = getRandomInt(1, 3);
+          const v = getRandomInt(30, 60);
+          const t = getRandomInt(2, 5);
+          if (k === 1) qs.push(createQuestion(`M?t ô tô di v?i v?n t?c ${v} km/h trong ${t} gi?. Quãng du?ng di du?c là:`, v*t, 'int', 'km'));
+          else if (k === 2) qs.push(createQuestion(`Xe máy di quãng du?ng ${v*t} km h?t ${t} gi?. V?n t?c c?a xe là:`, v, 'int', 'km/h'));
+          else qs.push(createQuestion(`Ði quãng du?ng ${v*t} km v?i v?n t?c ${v} km/h h?t bao lâu?`, t, 'int', 'gi?'));
+        }
+        return qs;
+      }
+    };
+
+    const CHAPTER_CONTENT = {
+      chuong1: {
+        id: 'chuong1',
+        title: 'Ôn t?p Phân s? & H?n s?',
+        icon: '1??',
+        desc: 'Phân s? th?p phân, h?n s?, chuy?n d?i và tính toán.',
+        theory: [
+          { type: 'header', content: '1. Phân s? th?p phân' },
+          { type: 'text', content: 'Các phân s? có m?u s? là 10, 100, 1000... du?c g?i là phân s? th?p phân.' },
+          { type: 'example', content: 'Ví d?: 3/10; 5/100; 17/1000 là các phân s? th?p phân.' },
+          { type: 'header', content: '2. H?n s?' },
+          { type: 'box', content: 'H?n s? g?m hai ph?n: Ph?n nguyên và Ph?n phân s?.\nPh?n phân s? c?a h?n s? bao gi? cung bé hon 1.' },
+          { type: 'header', content: '3. Chuy?n h?n s? thành phân s?' },
+          { type: 'text', content: 'Ta l?y ph?n nguyên nhân v?i m?u s? r?i c?ng v?i t? s? (d? làm t? s? m?i), gi? nguyên m?u s?.' },
+          { type: 'example', content: '2 1/3 = (2 x 3 + 1)/3 = 7/3' }
+        ]
+      },
+      chuong2: {
+        id: 'chuong2',
+        title: 'S? th?p phân & So sánh',
+        icon: '2??',
+        desc: 'Khái ni?m, hàng s?, d?c vi?t và so sánh.',
+        theory: [
+          { type: 'header', content: '1. Khái ni?m' },
+          { type: 'text', content: 'M?i s? th?p phân g?m hai ph?n: ph?n nguyên và ph?n th?p phân, ngan cách b?i d?u ph?y.' },
+          { type: 'example', content: '8,56: Ph?n nguyên là 8, ph?n th?p phân là 56.' },
+          { type: 'header', content: '2. So sánh' },
+          { type: 'box', content: 'So sánh ph?n nguyên tru?c. N?u b?ng nhau, so sánh hàng ph?n mu?i, ph?n tram...' }
+        ]
+      },
+      chuong3: {
+        id: 'chuong3',
+        title: 'Các phép tính s? th?p phân',
+        icon: '3??',
+        desc: 'C?ng, tr?, nhân, chia s? th?p phân.',
+        theory: [
+          { type: 'header', content: '1. C?ng, tr?' },
+          { type: 'box', content: 'Ð?t tính sao cho các d?u ph?y th?ng c?t.' },
+          { type: 'header', content: '2. Nhân, Chia' },
+          { type: 'text', content: 'Ð?m ch? s? th?p phân khi nhân. D?i d?u ph?y khi chia.' }
+        ]
+      },
+      chuong4: {
+        id: 'chuong4',
+        title: 'Hình h?c ph?ng',
+        icon: '4??',
+        desc: 'Di?n tích Tam giác, Hình thang, Hình tròn.',
+        theory: [
+          { type: 'header', content: '1. Tam giác & Hình thang' },
+          { type: 'box', content: 'S_tam_giác = (a x h) : 2\nS_hình_thang = (a + b) x h : 2' },
+          { type: 'header', content: '2. Hình tròn' },
+          { type: 'box', content: 'C = d x 3,14\nS = r x r x 3,14' }
+        ]
+      },
+      chuong5: {
+        id: 'chuong5',
+        title: 'T? s? ph?n tram',
+        icon: '5??',
+        desc: 'Gi?i toán v? t? s? ph?n tram.',
+        theory: [
+          { type: 'header', content: '1. Tìm t? s? %' },
+          { type: 'text', content: 'Tìm thuong hai s? -> Nhân v?i 100 và thêm %.' },
+          { type: 'header', content: '2. Tìm giá tr? %' },
+          { type: 'text', content: 'Mu?n tìm a% c?a B: L?y B x a : 100.' }
+        ]
+      },
+      chuong6: {
+        id: 'chuong6',
+        title: 'Toán chuy?n d?ng d?u',
+        icon: '6??',
+        desc: 'V?n t?c (v), Quãng du?ng (s), Th?i gian (t).',
+        theory: [
+          { type: 'header', content: '1. Công th?c' },
+          { type: 'box', content: 'v = s : t\ns = v x t\nt = s : v' },
+          { type: 'text', content: 'Luu ý: Các don v? do ph?i tuong ?ng.' }
+        ]
+      }
+    };
+
+    // --- COMPONENTS ---
+    const Navbar = ({ goHome }) => (
+      <nav style={{ background: 'linear-gradient(to right, #0284c7, #0ea5e9)', padding: '15px 20px', position: 'sticky', top: 0, zIndex: 50, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+        <div onClick={goHome} style={{ color: 'white', fontWeight: 'bold', fontSize: '1.4rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}><span>??</span> L?p H?c Toán 5</div>
+        <button onClick={goHome} style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid white', color: 'white', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>V? Trang Ch?</button>
+      </nav>
+    );
+
+    const ChapterCard = ({ chapter, onClick }) => (
+      <div onClick={onClick} style={{ background: 'white', borderRadius: '20px', padding: '25px', cursor: 'pointer', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', transition: 'transform 0.2s', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+           onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+        <div style={{ fontSize: '4rem', marginBottom: '15px' }}>{chapter.icon}</div>
+        <h3 style={{ color: '#0f172a', margin: '0 0 10px 0', fontSize: '1.2rem' }}>{chapter.title}</h3>
+        <p style={{ color: '#64748b', fontSize: '0.9rem', margin: 0 }}>{chapter.desc}</p>
+      </div>
+    );
+
+    const TheoryView = ({ chapter, onStartQuiz }) => (
+      <div style={{ maxWidth: '900px', margin: '30px auto', padding: '20px' }}>
+        <h1 style={{ textAlign: 'center', color: '#1e3a8a', fontSize: '2rem', marginBottom: '10px' }}>{chapter.title}</h1>
+        <p style={{ textAlign: 'center', color: '#64748b', fontSize: '1.1rem', marginBottom: '40px' }}>{chapter.desc}</p>
+        <div style={{ background: 'white', borderRadius: '15px', padding: '30px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
+          {chapter.theory.map((item, index) => {
+            if (item.type === 'header') return <h2 key={index} style={{ color: '#0369a1', marginTop: '25px', borderLeft: '5px solid #0ea5e9', paddingLeft: '15px' }}>{item.content}</h2>;
+            if (item.type === 'box') return <div key={index} style={{ background: '#ecfccb', border: '2px solid #84cc16', borderRadius: '10px', padding: '15px', margin: '20px 0', whiteSpace: 'pre-line', color: '#4d7c0f', fontWeight: 'bold' }}>{item.content}</div>;
+            if (item.type === 'example') return <div key={index} style={{ background: '#eff6ff', borderLeft: '4px solid #3b82f6', padding: '15px', margin: '15px 0', fontStyle: 'italic', color: '#1e40af' }}><strong>Ví d?:</strong> {item.content}</div>;
+            return <p key={index} style={{ lineHeight: '1.6', fontSize: '1.1rem', marginBottom: '15px', color: '#334155' }}>{item.content}</p>;
+          })}
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <button onClick={onStartQuiz} style={{ background: 'linear-gradient(to right, #f59e0b, #ea580c)', color: 'white', border: 'none', padding: '15px 50px', fontSize: '1.3rem', fontWeight: 'bold', borderRadius: '50px', cursor: 'pointer', boxShadow: '0 4px 15px rgba(234, 88, 12, 0.4)' }}>B?t d?u ôn t?p ngay ??</button>
+        </div>
+      </div>
+    );
+
+    const QuizView = ({ questions, title, onRetry }) => {
+      const [userAnswers, setUserAnswers] = useState({});
+      const [submitted, setSubmitted] = useState(false);
+      const score = questions.reduce((acc, q) => acc + (userAnswers[q.id] === q.correct ? 1 : 0), 0);
+
+      return (
+        <div style={{ maxWidth: '800px', margin: '30px auto', padding: '20px' }}>
+          <div style={{ background: '#fff', padding: '20px', borderRadius: '15px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '20px', borderLeft: '10px solid #7c3aed' }}>
+            <h2 style={{ margin: 0, color: '#4b5563' }}>?? Bài t?p: {title}</h2>
+            <p style={{ margin: '10px 0 0', color: '#6b7280' }}>Ð? bài du?c sinh ng?u nhiên. Hãy làm th?t k? nhé!</p>
+          </div>
+          {questions.map((q, idx) => {
+            const isCorrect = userAnswers[q.id] === q.correct;
+            const bg = submitted ? (isCorrect ? '#f0fdf4' : '#fef2f2') : '#fff';
+            const border = submitted ? (isCorrect ? '2px solid #22c55e' : '2px solid #ef4444') : '1px solid #e5e7eb';
+            return (
+              <div key={q.id} style={{ background: bg, padding: '20px', borderRadius: '12px', marginBottom: '20px', border, boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                <h3 style={{ marginTop: 0, color: '#1f2937' }}>Câu {idx + 1}: {q.question}</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '15px' }}>
+                  {q.options.map((opt, optIdx) => (
+                    <label key={optIdx} style={{ display: 'flex', alignItems: 'center', padding: '10px', borderRadius: '8px', border: '1px solid #e5e7eb', cursor: submitted ? 'default' : 'pointer', background: userAnswers[q.id] === optIdx ? '#e0f2fe' : 'transparent', fontWeight: userAnswers[q.id] === optIdx ? 'bold' : 'normal' }}>
+                      <input type="radio" name={`q-${q.id}`} checked={userAnswers[q.id] === optIdx} onChange={() => !submitted && setUserAnswers(prev => ({ ...prev, [q.id]: optIdx }))} disabled={submitted} style={{ marginRight: '10px' }} />
+                      {opt}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+          <div style={{ textAlign: 'center', marginTop: '40px', paddingBottom: '50px' }}>
+            {!submitted ? (
+              <button onClick={() => setSubmitted(true)} disabled={Object.keys(userAnswers).length < 10} style={{ background: Object.keys(userAnswers).length < 10 ? '#cbd5e1' : '#7c3aed', color: 'white', border: 'none', padding: '15px 40px', fontSize: '1.2rem', fontWeight: 'bold', borderRadius: '10px', cursor: Object.keys(userAnswers).length < 10 ? 'not-allowed' : 'pointer' }}>{Object.keys(userAnswers).length < 10 ? `Làm ${Object.keys(userAnswers).length}/10 câu` : 'N?p bài ngay'}</button>
+            ) : (
+              <div style={{ background: 'white', padding: '30px', borderRadius: '15px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+                <h2 style={{ fontSize: '2rem', color: '#7c3aed', margin: '0 0 10px 0' }}>K?t qu?: {score}/10</h2>
+                <button onClick={onRetry} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#7c3aed', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>Ch?n chuong khác</button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    const App = () => {
+      const [currentChapterId, setCurrentChapterId] = useState(null);
+      const [viewMode, setViewMode] = useState('theory');
+      const [quizQuestions, setQuizQuestions] = useState([]);
+
+      const handleStartQuiz = (chapterId) => {
+        if (Generators[chapterId]) {
+          setQuizQuestions(Generators[chapterId]());
+          setViewMode('quiz');
+          window.scrollTo(0, 0);
+        }
+      };
+
+      const activeChapter = currentChapterId ? CHAPTER_CONTENT[currentChapterId] : null;
+
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <Navbar goHome={() => { setCurrentChapterId(null); setViewMode('theory'); }} />
+          <main style={{ flex: 1 }}>
+            {!activeChapter ? (
+              <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '0 20px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+                  <h1 style={{ color: '#0f172a', fontSize: '2.5rem', marginBottom: '15px' }}>H? th?ng ôn t?p Toán L?p 5</h1>
+                  <p style={{ color: '#64748b', fontSize: '1.2rem' }}>Bám sát chuong trình sách giáo khoa "K?t n?i tri th?c"</p>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '25px' }}>
+                  {Object.values(CHAPTER_CONTENT).map(chapter => (
+                    <ChapterCard key={chapter.id} chapter={chapter} onClick={() => setCurrentChapterId(chapter.id)} />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              viewMode === 'theory' ? 
+                <TheoryView chapter={activeChapter} onStartQuiz={() => handleStartQuiz(activeChapter.id)} /> : 
+                <QuizView questions={quizQuestions} title={activeChapter.title} onRetry={() => { setCurrentChapterId(null); setViewMode('theory'); }} />
+            )}
+          </main>
+          <footer style={{ backgroundColor: '#1e293b', color: '#94a3b8', textAlign: 'center', padding: '25px' }}>
+            <p style={{ fontWeight: 'bold', color: 'white' }}>© 2024 L?p H?c Toán 5</p>
+          </footer>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
