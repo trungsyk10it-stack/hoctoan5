@@ -738,10 +738,10 @@ const QuizView = ({ questions, title, onRetry }: { questions: Question[], title:
   };
 
   const getFeedbackMessage = (score: number) => {
-    if (score === 10) return "Tuyệt vời quá! Em đạt điểm tối đa rồi, thầy rất tự hào về em! 🌟";
-    if (score >= 8) return "Rất giỏi! Em làm bài rất tốt, cố gắng phát huy nhé! 👍";
-    if (score >= 5) return "Em làm khá tốt! Hãy xem lại các câu sai để rút kinh nghiệm nhé, thầy tin lần sau em sẽ làm tốt hơn! 💪";
-    return "Không sao đâu, quan trọng là em đã cố gắng! Hãy ôn lại lý thuyết và làm lại bài nhé, thầy luôn ủng hộ em! ❤️";
+    if (score === 10) return "Tuyệt vời quá! Con đạt điểm tối đa rồi, thầy rất tự hào về con! 🌟";
+    if (score >= 8) return "Rất giỏi! Con làm bài rất tốt, cố gắng phát huy nhé! 👍";
+    if (score >= 5) return "Con làm khá tốt! Hãy xem lại các câu sai để rút kinh nghiệm nhé, thầy tin lần sau con sẽ làm tốt hơn! 💪";
+    return "Không sao đâu, quan trọng là con đã cố gắng! Hãy ôn lại lý thuyết và làm lại bài nhé, thầy luôn ủng hộ con! ❤️";
   };
 
   return (
@@ -749,7 +749,7 @@ const QuizView = ({ questions, title, onRetry }: { questions: Question[], title:
       <div style={{ background: 'white', padding: '25px', borderRadius: '25px', boxShadow: '0 8px 0 #bae6fd', marginBottom: '30px', border: '4px solid #38bdf8', textAlign: 'center' }}>
         <h2 style={{ margin: 0, color: '#0369a1', fontSize: '2rem', fontWeight: '900' }}>⭐ Bài tập tự luyện ⭐</h2>
         <h3 style={{ margin: '10px 0', color: '#0ea5e9', fontSize: '1.4rem' }}>{title}</h3>
-        <p style={{ margin: '10px 0 0', color: '#64748b', fontWeight: 'bold' }}>Em hãy suy nghĩ thật kỹ nhé!</p>
+        <p style={{ margin: '10px 0 0', color: '#64748b', fontWeight: 'bold' }}>Đề bài được sinh ngẫu nhiên. Hãy suy nghĩ thật kỹ nhé!</p>
       </div>
 
       {questions.map((q, index) => {
@@ -925,6 +925,7 @@ const App = () => {
 
   return (
     <div className="pattern-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <style dangerouslySetInnerHTML={{ __html: FUN_STYLES }} />
       <Navbar goHome={() => { setCurrentChapterId(null); setViewMode('theory'); }} />
       
       <main style={{ flex: 1, paddingBottom: '40px' }}>
