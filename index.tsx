@@ -54,6 +54,22 @@ const FUN_STYLES = `
     50% { transform: translateY(-10px); }
     100% { transform: translateY(0px); }
   }
+
+  .chapters-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  @media (min-width: 600px) {
+    .chapters-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .chapters-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
 `;
 
 // --- TYPES ---
@@ -914,7 +930,7 @@ const App = () => {
       <main style={{ flex: 1, paddingBottom: '40px' }}>
         {!activeChapterData ? (
           // HOME PAGE GRID
-          <div style={{ maxWidth: '1000px', margin: '40px auto', padding: '0 20px' }}>
+          <div style={{ maxWidth: '1200px', margin: '40px auto', padding: '0 20px' }}>
             <div style={{ textAlign: 'center', marginBottom: '60px' }}>
               <div className="cloud-title">
                 <h1 style={{ fontSize: '3rem', margin: '0 0 5px 0', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: '900' }}>Toán Lớp 5 ✨</h1>
@@ -922,7 +938,7 @@ const App = () => {
               </div>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}>
+            <div className="chapters-grid">
               {Object.values(CHAPTER_CONTENT).map((chapter, index) => (
                 <ChapterCard key={chapter.id} chapter={chapter} index={index} onClick={() => setCurrentChapterId(chapter.id)} />
               ))}
