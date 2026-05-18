@@ -205,11 +205,38 @@ const Generators = {
   chuong1: () => { // Số thập phân
     const qs: Question[] = [];
     for (let i = 0; i < 10; i++) {
-        const type = getRandomInt(1, 4);
-        if (type === 1) { // Giá trị theo hàng
-          const a = getRandomInt(1, 9);
-          const b = getRandomInt(0, 9);
-          const c = getRandomInt(0, 9);
+        const type = (i % 4) + 1;
+        if (type === 1) { // Đọc số, viết số
+          const isWrite = Math.random() > 0.5;
+          const numList = [
+            { text: "Sáu mươi tám phẩy bốn mươi hai", val: 68.42, read: "Sáu mươi tám phẩy bốn mươi hai" },
+            { text: "Hai mươi lăm phẩy mười lăm", val: 25.15, read: "Hai mươi lăm phẩy mười lăm" },
+            { text: "Không phẩy bảy mươi lăm", val: 0.75, read: "Không phẩy bảy mươi lăm" },
+            { text: "Mười hai phẩy không ba", val: 12.03, read: "Mười hai phẩy không ba" },
+            { text: "Năm phẩy ba trăm mười tư", val: 5.314, read: "Năm phẩy ba trăm mười tư" }
+          ];
+          const item = getRandomItem(numList);
+          if (isWrite) {
+            qs.push(createQuestion(`Số "${item.text}" được viết là:`, item.val, 'float', '', `Số "${item.text}" viết là ${formatNum(item.val)}.`));
+          } else {
+            const wrong1 = item.read.replace("phẩy ", "phẩy không ");
+            const wrong2 = item.read.includes("mươi ") ? item.read.replace("mươi ", "mươi không ") : item.read.replace("phẩy ", "phẩy không không ");
+            let optsArr = Array.from(new Set([item.read, wrong1, wrong2, "Không có đáp án đúng"]));
+            if (optsArr.length < 4) optsArr.push("Đáp án khác");
+            qs.push({
+              id: Math.random(),
+              question: `Số ${formatNum(item.val)} được đọc là:`,
+              options: shuffleArray(optsArr),
+              correct: -1,
+              explanation: `Số ${formatNum(item.val)} được đọc là: ${item.read}.`
+            });
+            qs[qs.length - 1].correct = qs[qs.length - 1].options.indexOf(item.read);
+          }
+        } else if (type === 2) { // Giá trị theo hàng
+          const uniqueDigits = shuffleArray([2, 3, 4, 6, 7, 8, 9]);
+          const a = uniqueDigits[0];
+          const b = uniqueDigits[1];
+          const c = uniqueDigits[2];
           const numStr = `1${a},${b}${c}5`;
           qs.push({
             id: Math.random(),
@@ -218,10 +245,10 @@ const Generators = {
             correct: -1,
             explanation: `Trong số thập phân ${numStr}:\n- Chữ số 1 thuộc hàng chục.\n- Chữ số ${a} thuộc hàng đơn vị.\n- Chữ số ${b} thuộc hàng phần mười.\n- Chữ số ${c} thuộc hàng phần trăm.\n- Chữ số 5 thuộc hàng phần nghìn.`
           });
-          const opts = qs[i].options;
+          const opts = qs[qs.length - 1].options;
           const correctTxt = "Hàng phần trăm";
-          qs[i].correct = opts.indexOf(correctTxt);
-        } else if (type === 2) { // So sánh
+          qs[qs.length - 1].correct = opts.indexOf(correctTxt);
+        } else if (type === 3) { // So sánh
           const base = getRandomFloat(10, 50, 1);
           const diff = 0.1;
           const target = parseFloat((base + diff).toFixed(1));
@@ -232,136 +259,210 @@ const Generators = {
             correct: -1,
             explanation: `Ta so sánh các số:\n${formatNum(target)} > ${formatNum(base)} (Vì phần nguyên bằng nhau, hàng phần mười ${formatNum(target).split(',')[1] || 0} > ${formatNum(base).split(',')[1] || 0}).`
           });
-          qs[i].correct = qs[i].options.indexOf(formatNum(target));
-        } else if (type === 3) { // Làm tròn
+          qs[qs.length - 1].correct = qs[qs.length - 1].options.indexOf(formatNum(target));
+
+        } else { // Làm tròn
           const num = getRandomFloat(10, 99, 2); 
           const rounded = Math.round(num);
-          qs.push(createQuestion(`Làm tròn số ${formatNum(num)} (diện tích một đồi chè ở Tân Sơn tính bằng ha) đến hàng đơn vị ta được:`, rounded, 'int', 'ha', `Hàng phần mười của ${formatNum(num)} là ${Math.floor((num * 10) % 10)}.\nNếu hàng phần mười >= 5 thì làm tròn lên, < 5 thì làm tròn xuống.\nVậy ${formatNum(num)} làm tròn thành ${rounded}.`));
-        } else { // Đổi đơn vị
+          qs.push(createQuestion(`Diện tích một đồi chè ở Tân Sơn là ${formatNum(num)} ha. Làm tròn diện tích đó đến hàng đơn vị ta được:`, rounded, 'int', 'ha', `Hàng phần mười của ${formatNum(num)} là ${Math.floor((num * 10) % 10)}.\nNếu hàng phần mười >= 5 thì làm tròn lên, < 5 thì làm tròn xuống.\nVậy ${formatNum(num)} làm tròn thành ${rounded}.`));
+        }
+    }
+    return shuffleArray(qs);
+  },
+  chuong2: () => { // Đơn vị đo diện tích, thể tích, khối lượng, độ dài
+    const qs: Question[] = [];
+    for (let i = 0; i < 10; i++) {
+      const type = (i % 3) + 1;
+      if (type === 1) { // Đổi đơn vị
+        const subtype = getRandomInt(1, 3);
+        if (subtype === 1) {
+          const ha = getRandomInt(2, 5);
+          const randPlace = getRandomItem(["khu bảo tồn Đền Hùng", "đồi chè Long Cốc", "vườn Quốc gia Xuân Sơn"]);
+          qs.push(createQuestion(`Một mảnh đất ở ${randPlace} có diện tích ${ha} ha. Diện tích đó bằng bao nhiêu mét vuông?`, ha * 10000, 'int', 'm²', `1 ha = 10 000 m². Vậy ${ha} ha = ${ha * 10000} m².`));
+        } else if (subtype === 2) {
           const m = getRandomInt(3, 8);
           const cm = getRandomInt(10, 99);
           const val = parseFloat(`${m}.${cm}`); 
           const correctVal = m + cm/100;
           const tree = getRandomItem(["Cây Cọ", "Cây Keo", "Cây Mỡ", "Cây Bưởi"]);
-          qs.push(createQuestion(`Một ${tree} ở vùng đồi Phú Thọ cao ${m}m ${cm}cm. Chiều cao của cây viết dưới dạng số thập phân là ... m`, correctVal, 'float', 'm', `Ta có: ${cm}cm = ${cm}/100 m = ${formatNum(cm/100)}m.\nVậy ${m}m ${cm}cm = ${m}m + ${formatNum(cm/100)}m = ${formatNum(correctVal)}m.`));
+          qs.push(createQuestion(`Một ${tree} ở vùng đồi Phú Thọ cao ${m}m ${cm}cm. Chiều cao của cây viết dưới dạng số thập phân là bao nhiêu m?`, correctVal, 'float', 'm', `Ta có: ${cm}cm = ${cm}/100 m = ${formatNum(cm/100)}m.\nVậy ${m}m ${cm}cm = ${m}m + ${formatNum(cm/100)}m = ${formatNum(correctVal)}m.`));
+        } else {
+          const kg = getRandomInt(1, 5);
+          const g = getRandomInt(10, 990);
+          const val = kg + g / 1000;
+          qs.push(createQuestion(`${kg}kg ${g}g = ... kg. Số thích hợp để điền vào chỗ chấm là:`, val, 'float', '', `Ta có: ${g}g = ${g}/1000 kg = ${formatNum(g/1000)}kg.\nVậy ${kg}kg ${g}g = ${formatNum(val)}kg.`));
         }
-    }
-    return qs;
-  },
-  chuong2: () => { // Đơn vị đo diện tích, thể tích
-    const qs: Question[] = [];
-    for (let i = 0; i < 10; i++) {
-      const type = getRandomInt(1, 3);
-      if (type === 1) { // ha <=> m2
-        const ha = getRandomInt(2, 5);
-        const randPlace = getRandomItem(["khu bảo tồn Đền Hùng", "đồi chè Long Cốc", "vườn Quốc gia Xuân Sơn"]);
-        qs.push(createQuestion(`Một mảnh đất ở ${randPlace} có diện tích ${ha} ha. Diện tích đó bằng bao nhiêu mét vuông?`, ha * 10000, 'int', 'm²', `1 ha = 10 000 m². Vậy ${ha} ha = ${ha * 10000} m².`));
-      } else if (type === 2) { // m3 to dm3
-        const m3 = getRandomFloat(1, 5, 1);
-        qs.push(createQuestion(`Một bể chứa nước cung cấp cho trường học có dung tích ${formatNum(m3)} m³. Bể đó chứa bao nhiêu đề-xi-mét khối nước?`, m3 * 1000, 'int', 'dm³', `1 m³ = 1000 dm³. Vậy ${formatNum(m3)} m³ = ${m3 * 1000} dm³.`));
-      } else { // cm3
-        const m = getRandomInt(5, 12);
-        qs.push(createQuestion(`Một khối gỗ mỹ nghệ có thể tích ${m} dm³. Đổi thể tích này ra xăng-ti-mét khối ta được:`, m * 1000, 'int', 'cm³', `1 dm³ = 1000 cm³. Vậy khối gỗ có thể tích ${m * 1000} cm³.`));
+      } else if (type === 2) { // Điền dấu (so sánh 2 đại lượng)
+        const isBigger = Math.random() > 0.5;
+        const isEqual = Math.random() > 0.7; // 30% chance for equality
+        const m = getRandomInt(2, 9);
+        const cm = getRandomInt(1, 99);
+        const val1Str = `${m}m ${cm}cm`;
+        const val1InM = m + cm / 100;
+        let val2InM = val1InM;
+        let val2Str = `${formatNum(val2InM)}m`;
+        let correctSign = "=";
+        if (!isEqual) {
+           if (isBigger) {
+             val2InM = val1InM - 0.1;
+             correctSign = ">";
+           } else {
+             val2InM = val1InM + 0.1;
+             correctSign = "<";
+           }
+           val2InM = parseFloat(val2InM.toFixed(2));
+           val2Str = `${formatNum(val2InM)}m`;
+        }
+        qs.push({
+          id: Math.random(),
+          question: `Điền dấu thích hợp vào chỗ chấm: ${val1Str} ... ${val2Str}`,
+          options: shuffleArray([">", "<", "=", "Không thể so sánh"]),
+          correct: -1,
+          explanation: `Đổi ${val1Str} = ${formatNum(val1InM)}m.\nSo sánh: ${formatNum(val1InM)} ${correctSign} ${formatNum(val2InM)} nên dấu cần điền là ${correctSign}.`
+        });
+        qs[qs.length - 1].correct = qs[qs.length - 1].options.indexOf(correctSign);
+      } else { // So sánh với phép tính
+        const v1 = getRandomFloat(1, 5, 1);
+        const v2 = getRandomFloat(1, 5, 1);
+        const sum = v1 + v2;
+        let comp = sum;
+        let correctSign = "=";
+        const rand = Math.random();
+        if (rand < 0.33) {
+          comp = sum + 0.5;
+          correctSign = "<";
+        } else if (rand < 0.66) {
+          comp = sum - 0.5;
+          correctSign = ">";
+        }
+        qs.push({
+          id: Math.random(),
+          question: `Dấu thích hợp để điền vào chỗ chấm là: ${formatNum(v1)} tấn + ${formatNum(v2)} tấn ... ${formatNum(comp)} tấn`,
+          options: shuffleArray([">", "<", "=", "Không thể so sánh"]),
+          correct: -1,
+          explanation: `Thực hiện phép tính: ${formatNum(v1)} + ${formatNum(v2)} = ${formatNum(sum)} tấn.\nSo sánh ${formatNum(sum)} ${correctSign} ${formatNum(comp)} nên dấu cần điền là ${correctSign}.`
+        });
+        qs[qs.length - 1].correct = qs[qs.length - 1].options.indexOf(correctSign);
       }
     }
-    return qs;
+    return shuffleArray(qs);
   },
   chuong3: () => { // Phép tính số thập phân
     const qs: Question[] = [];
     for(let i=0; i<10; i++) {
-        const op = getRandomInt(1, 4);
-        const a = getRandomFloat(10, 50, 1);
-        const b = getRandomFloat(1, 9, 1);
-        let ans = 0;
-        let label = "";
-        
-        if (op === 1) { label = "+"; ans = a + b; }
-        else if (op === 2) { label = "-"; ans = a - b; }
-        else if (op === 3) { label = "x"; ans = a * b; } 
-        else { 
-            const res = getRandomFloat(2, 10, 1);
-            const div = getRandomInt(2, 5);
-            const dividend = res * div;
-            label = ":"; 
-            ans = res;
-            qs.push(createQuestion(`Kết quả phép tính: ${formatNum(parseFloat(dividend.toFixed(2)))} : ${div} = ?`, ans, 'float', '', `Ta thực hiện phép chia: ${formatNum(parseFloat(dividend.toFixed(2)))} : ${div} = ${formatNum(ans)}.`));
-            continue;
-        }
-        
-        ans = parseFloat(ans.toFixed(2));
-        
-        if (Math.random() < 0.3) {
-            const product = getRandomItem(PHUTHO_SPECIALTIES);
-            const price = getRandomInt(25, 60) * 1000; 
-            const quantity = product.isWeight ? getRandomFloat(2, 10, 1) : getRandomInt(2, 10);
-            const total = price * quantity;
-            qs.push(createQuestion(`Mua ${formatNum(quantity)} ${product.unit} ${product.name} với giá ${formatNum(price)} đồng/${product.unit} thì hết bao nhiêu tiền?`, total, 'int', 'đồng', `Số tiền phải trả là:\n${formatNum(price)} x ${formatNum(quantity)} = ${formatNum(total)} (đồng).`));
-        } else {
-            qs.push(createQuestion(`Tính: ${formatNum(a)} ${label} ${formatNum(b)} = ?`, ans, 'float', '', `Kết quả: ${formatNum(a)} ${label} ${formatNum(b)} = ${formatNum(ans)}.`));
+        const type = (i % 7) + 1;
+        if (type === 1) { // Cộng
+          const a = getRandomFloat(10, 50, 2);
+          const b = getRandomFloat(10, 50, 2);
+          const ans = parseFloat((a + b).toFixed(2));
+          qs.push(createQuestion(`Thực hiện phép tính: ${formatNum(a)} + ${formatNum(b)} = ?`, ans, 'float', '', `${formatNum(a)} + ${formatNum(b)} = ${formatNum(ans)}.`));
+        } else if (type === 2) { // Trừ
+          const a = getRandomFloat(30, 99, 2);
+          const b = getRandomFloat(10, 29, 2);
+          const ans = parseFloat((a - b).toFixed(2));
+          qs.push(createQuestion(`Thực hiện phép tính: ${formatNum(a)} - ${formatNum(b)} = ?`, ans, 'float', '', `${formatNum(a)} - ${formatNum(b)} = ${formatNum(ans)}.`));
+        } else if (type === 3) { // Nhân
+          const a = getRandomFloat(1, 10, 2);
+          const b = getRandomFloat(2, 5, 1);
+          const ans = parseFloat((a * b).toFixed(3));
+          qs.push(createQuestion(`Thực hiện phép tính: ${formatNum(a)} x ${formatNum(b)} = ?`, ans, 'float', '', `${formatNum(a)} x ${formatNum(b)} = ${formatNum(ans)}.`));
+        } else if (type === 4) { // Chia STN cho STP
+          const opts = [[12, 1.5, 8], [24, 2.5, 9.6], [10, 0.5, 20], [15, 2.5, 6], [18, 1.2, 15]];
+          const [divd, divs, ans] = getRandomItem(opts);
+          qs.push(createQuestion(`Thực hiện phép tính: ${formatNum(divd)} : ${formatNum(divs)} = ?`, ans, 'float', '', `${formatNum(divd)} : ${formatNum(divs)} = ${formatNum(ans)}.`));
+        } else if (type === 5) { // Chia STP cho STP
+          const ans = getRandomFloat(1.1, 5.5, 1);
+          const divs = getRandomFloat(1.1, 3.5, 1);
+          const divd = parseFloat((ans * divs).toFixed(2));
+          qs.push(createQuestion(`Thực hiện phép tính: ${formatNum(divd)} : ${formatNum(divs)} = ?`, ans, 'float', '', `${formatNum(divd)} : ${formatNum(divs)} = ${formatNum(ans)}.`));
+        } else if (type === 6) { // Chia STP cho STN
+          const ans = getRandomFloat(1.1, 5.5, 2);
+          const divs = getRandomInt(2, 9);
+          const divd = parseFloat((ans * divs).toFixed(2));
+          qs.push(createQuestion(`Thực hiện phép tính: ${formatNum(divd)} : ${formatNum(divs)} = ?`, ans, 'float', '', `${formatNum(divd)} : ${formatNum(divs)} = ${formatNum(ans)}.`));
+        } else { // Tìm số dư
+          const qs_du = [
+            { divd: 43.19, divs: 21, quo: 2.05, rem: 0.14 },
+            { divd: 22.44, divs: 18, quo: 1.24, rem: 0.12 },
+            { divd: 15.26, divs: 12, quo: 1.27, rem: 0.02 },
+            { divd: 5.75, divs: 4, quo: 1.43, rem: 0.03 },
+            { divd: 6.25, divs: 7, quo: 0.89, rem: 0.02 }
+          ];
+          const item = getRandomItem(qs_du);
+          qs.push(createQuestion(`Trong phép chia ${formatNum(item.divd)} : ${formatNum(item.divs)} nếu thương lấy hai chữ số ở phần thập phân là ${formatNum(item.quo)} thì số dư là:`, item.rem, 'float', '', `Thử lại: ${formatNum(item.divs)} x ${formatNum(item.quo)} = ${formatNum(parseFloat((item.divs * item.quo).toFixed(2)))}.\nVậy số dư là: ${formatNum(item.divd)} - ${formatNum(parseFloat((item.divs * item.quo).toFixed(2)))} = ${formatNum(item.rem)}.`));
         }
     }
-    return qs;
+    return shuffleArray(qs);
   },
   chuong4: () => { // Hình học phẳng
     const qs: Question[] = [];
     for(let i=0; i<10; i++) {
-        const type = getRandomInt(1, 3);
-        if (type === 1) { // Tam giác
+        const type = (i % 5) + 1;
+        if (type === 1) { // Tính diện tích (tam giác)
             const a = getRandomFloat(10, 50, 1);
             const h = getRandomFloat(5, 20, 1);
             const s = (a * h) / 2;
-            const context = getRandomItem(["Một mảnh đất trồng chè ở Tân Sơn", "Một vườn hoa ở công viên Văn Lang"]);
+            const context = getRandomItem(["Một mảnh đất trồng chè ở Tân Sơn", "Một mảnh vườn ở công viên Văn Lang"]);
             qs.push(createQuestion(`${context} hình tam giác có độ dài đáy ${formatNum(a)}m và chiều cao ${formatNum(h)}m. Diện tích là:`, parseFloat(s.toFixed(2)), 'float', 'm²', `Diện tích = (đáy x chiều cao) : 2.\nS = (${formatNum(a)} x ${formatNum(h)}) : 2 = ${formatNum(parseFloat(s.toFixed(2)))} (m²).`));
-        } else if (type === 2) { // Hình tròn
-            const r = getRandomInt(30, 80); 
-            const s = r * r * 3.14;
-            qs.push(createQuestion(`Mặt trống đồng hình tròn có bán kính r = ${r}cm. Diện tích mặt trống là:`, parseFloat(s.toFixed(2)), 'float', 'cm²', `Diện tích = r x r x 3,14.\nS = ${r} x ${r} x 3,14 = ${formatNum(parseFloat(s.toFixed(2)))} (cm²).`));
-        } else { // Hình thang
-            const a = getRandomInt(20, 50);
-            const b = getRandomInt(10, 30);
-            const h = getRandomInt(10, 25);
+        } else if (type === 2) { // Tính chu vi hình tròn
+            const r = getRandomInt(10, 50); 
+            const c = r * 2 * 3.14;
+            qs.push(createQuestion(`Mặt một chiếc bàn hình tròn có bán kính r = ${r}cm. Chu vi mặt bàn là:`, parseFloat(c.toFixed(2)), 'float', 'cm', `Chu vi = r x 2 x 3,14.\nC = ${r} x 2 x 3,14 = ${formatNum(parseFloat(c.toFixed(2)))} (cm).`));
+        } else if (type === 3) { // Tìm chiều cao tam giác
+            const h = getRandomInt(5, 20);
+            const a = getRandomInt(10, 40);
+            const s = (a * h) / 2;
+            qs.push(createQuestion(`Một biển báo giao thông hình tam giác có diện tích ${formatNum(s)} cm² và độ dài đáy là ${a} cm. Chiều cao của biển báo là:`, h, 'int', 'cm', `Chiều cao = Diện tích x 2 : đáy.\nh = ${formatNum(s)} x 2 : ${a} = ${h} (cm).`));
+        } else if (type === 4) { // Tìm bán kính hình tròn
+            const r = getRandomInt(2, 15);
+            const c = parseFloat((r * 2 * 3.14).toFixed(2));
+            qs.push(createQuestion(`Một hồ nước hình tròn có chu vi là ${formatNum(c)} m. Bán kính của hồ nước đó là:`, r, 'int', 'm', `Bán kính = Chu vi : 3,14 : 2.\nr = ${formatNum(c)} : 3,14 : 2 = ${r} (m).`));
+        } else { // Tìm đáy hình thang
+            const a = getRandomInt(15, 30);
+            const b = getRandomInt(5, 14);
+            const h = getRandomInt(5, 20);
             const s = ((a + b) * h) / 2;
-            const context = getRandomItem(["Một thửa ruộng bậc thang ở đồi chè Long Cốc", "Một mảnh vườn trồng bưởi ở Đoan Hùng"]);
-            qs.push(createQuestion(`${context} hình thang có đáy lớn ${a}m, đáy bé ${b}m, chiều cao ${h}m. Diện tích là:`, s, 'float', 'm²', `Diện tích = (đáy lớn + đáy bé) x chiều cao : 2.\nS = (${a} + ${b}) x ${h} : 2 = ${formatNum(s)} (m²).`));
+            qs.push(createQuestion(`Một thửa ruộng hình thang có diện tích ${formatNum(s)} m², chiều cao là ${h} m. Biết đáy bé là ${b} m, độ dài đáy lớn là:`, a, 'int', 'm', `Tổng độ dài hai đáy = Diện tích x 2 : chiều cao = ${formatNum(s)} x 2 : ${h} = ${a+b} (m).\nĐáy lớn = Tổng 2 đáy - đáy bé = ${a+b} - ${b} = ${a} (m).`));
         }
     }
-    return qs;
+    return shuffleArray(qs);
   },
-  chuong5: () => { // Tỉ số % tổng-tỉ hiệu-tỉ
+  chuong5: () => { // Tỉ số phần trăm, biểu đồ
     const qs: Question[] = [];
     for(let i=0; i<10; i++) {
-        // Có 6 dạng bài, luân phiên để chia đều
-        const subtype = (i % 6) + 1;
-        if (subtype === 1) { // Khái niệm tỉ số %
-            const num = getRandomInt(1, 99);
-            qs.push(createQuestion(`Phân số ${num}/100 được viết dưới dạng tỉ số phần trăm là:`, num, 'int', '%', `Phân số có mẫu số là 100 viết dưới dạng phần trăm là ${num}%.`));
-        } else if (subtype === 2) { // Tổng - Tỉ
-            const singlePart = getRandomInt(10, 30);
-            const numA = 3; const numB = 5;
-            const total = singlePart * (numA + numB);
-            const ans = singlePart * numB;
-            qs.push(createQuestion(`Trường Tiểu học tham gia lễ hội có ${total} bạn học sinh. Tỉ số giữa số bạn nam và số bạn nữ là ${numA}/${numB}. Hỏi đội có bao nhiêu bạn nữ?`, ans, 'int', 'bạn', `Tổng số phần bằng nhau: ${numA} + ${numB} = ${numA + numB} phần.\nGiá trị 1 phần: ${total} : ${numA + numB} = ${singlePart} bạn.\nSố bạn nữ là: ${singlePart} x ${numB} = ${ans} bạn.`));
-        } else if (subtype === 3) { // Hiệu - Tỉ
-            const singlePart = getRandomInt(5, 15);
-            const numA = 7; const numB = 4;
-            const diff = singlePart * (numA - numB);
-            const ans = singlePart * numA;
-            qs.push(createQuestion(`Bác nông dân thu hoạch cam và dưa hấu, số cam nhiều hơn số dưa hấu là ${diff} quả. Tỉ số giữa dưa hấu và cam là ${numB}/${numA}. Hỏi có bao nhiêu quả cam?`, ans, 'int', 'quả', `Hiệu số phần bằng nhau: ${numA} - ${numB} = ${numA - numB} phần.\nGiá trị 1 phần: ${diff} : ${numA - numB} = ${singlePart} quả.\nSố cam là: ${singlePart} x ${numA} = ${ans} quả.`));
-        } else if (subtype === 4) { // Tìm tỉ số % của 2 số
+        const type = (i % 4) + 1;
+        if (type === 1) { // Tìm tỉ số % của hai số
             const a = getRandomInt(1, 10) * 5; 
-            const b = 100; 
-            const val = a; 
-            qs.push(createQuestion(`Trong vườn trường có ${b} cây, trong đó ${a} cây bàng. Tỉ số phần trăm của số cây bàng và tổng số cây trong vườn là:`, val, 'int', '%', `Tỉ số phần trăm: ${a} : ${b} = ${formatNum(a/b)} = ${val}%.`));
-        } else if (subtype === 5) { // Tìm giá trị % của 1 số
-            const total = getRandomInt(10, 100) * 10;
-            const percent = getRandomInt(1, 9) * 10; 
+            const b = 100; // Let's make b dynamic but simple: 50, 100, 200
+            const bList = [50, 100, 200, 400];
+            const chosenB = getRandomItem(bList);
+            const chosenA = getRandomInt(1, chosenB/5) * 5;
+            const val = (chosenA / chosenB) * 100;
+            qs.push(createQuestion(`Lớp 5A có ${chosenB} học sinh, trong đó có ${chosenA} học sinh nữ. Tỉ số phần trăm của số học sinh nữ và tổng số học sinh là:`, val, 'int', '%', `Tỉ số phần trăm: ${chosenA} : ${chosenB} = ${formatNum(chosenA/chosenB)} = ${val}%.`));
+        } else if (type === 2) { // Tìm giá trị % của 1 số
+            const percent = getRandomInt(1, 9) * 10;
+            const total = getRandomInt(10, 50) * 10;
             const val = (total * percent) / 100;
-            qs.push(createQuestion(`Tìm ${percent}% của ${total}kg gạo:`, val, 'float', 'kg', `Muốn tìm ${percent}% của ${total}, ta lấy ${total} x ${percent} : 100 = ${formatNum(val)} (kg).`));
-        } else { // Bản đồ
-            const ratio = 10000;
-            const cm = getRandomInt(2, 8);
-            const m = (cm * ratio) / 100;
-            qs.push(createQuestion(`Trên bản đồ tỉ lệ 1:${ratio}, quãng đường từ nhà Lan đến trường dài ${cm}cm. Độ dài thật là bao nhiêu mét?`, m, 'int', 'm', `Độ dài thật trên bản đồ: ${cm} x ${ratio} = ${cm * ratio} cm.\nĐổi ${cm * ratio} cm = ${m} m.`));
+            qs.push(createQuestion(`Một mảnh vườn có ${total} cây ăn quả. Số cây nhãn chiếm ${percent}%. Hỏi có bao nhiêu cây nhãn trong vườn?`, val, 'int', 'cây', `Số cây nhãn là: ${total} x ${percent} : 100 = ${val} (cây).`));
+        } else if (type === 3) { // Bài toán mua bán, tiền lãi, tiền vốn
+            const isInterestOnly = Math.random() < 0.5;
+            const goc = getRandomInt(2, 5) * 1000000;
+            const percent = getRandomInt(5, 15);
+            if (isInterestOnly) {
+              const lai = (goc * percent) / 100;
+              qs.push(createQuestion(`Mẹ gửi tiết kiệm ${formatNum(goc)} đồng với lãi suất ${percent}% một năm. Hỏi sau 1 năm mẹ được bao nhiêu tiền lãi?`, lai, 'int', 'đồng', `Tiền lãi sau 1 năm là: ${formatNum(goc)} x ${percent} : 100 = ${formatNum(lai)} (đồng).`));
+            } else {
+              const lai = (goc * percent) / 100;
+              const total = goc + lai;
+              qs.push(createQuestion(`Một cửa hàng bỏ ra ${formatNum(goc)} đồng tiền vốn để nhập hàng. Cửa hàng bán lãi ${percent}%. Hỏi tiền thu về (cả vốn và lãi) là bao nhiêu?`, total, 'int', 'đồng', `Tiền lãi là: ${formatNum(goc)} x ${percent} : 100 = ${formatNum(lai)} (đồng).\nCả vốn và lãi là: ${formatNum(goc)} + ${formatNum(lai)} = ${formatNum(total)} (đồng).`));
+            }
+        } else { // Biểu đồ phần trăm
+            const p1 = getRandomInt(20, 30);
+            const p2 = getRandomInt(30, 40);
+            const p3 = 100 - p1 - p2;
+            const tree1 = getRandomItem(["Nhãn", "Xoài", "Bưởi", "Cam"]);
+            const tree2 = getRandomItem(["Ổi", "Táo", "Mít", "Chôm chôm"]);
+            qs.push(createQuestion(`Biểu đồ hình quạt cho biết tỉ lệ cây trong vườn: ${tree1} chiếm ${p1}%, ${tree2} chiếm ${p2}%, còn lại là cây chuối. Hỏi cây chuối chiếm bao nhiêu phần trăm?`, p3, 'int', '%', `Tổng phần trăm của ${tree1} và ${tree2} là: ${p1}% + ${p2}% = ${p1+p2}%.\nCây chuối chiếm: 100% - ${p1+p2}% = ${p3}%.`));
         }
     }
     return shuffleArray(qs);
@@ -370,37 +471,40 @@ const Generators = {
     const qs: Question[] = [];
     for(let i=0; i<10; i++) {
         const subtype = (i % 6) + 1;
-        if (subtype === 1) { // Hình Lập phương - Sxq
+        if (subtype === 1) { // Hình Lập phương - Không nắp
             const edge = getRandomInt(2, 6);
-            const sqxq = edge * edge * 4;
-            qs.push(createQuestion(`Diện tích xung quanh của một hình lập phương có cạnh ${edge}cm là:`, sqxq, 'int', 'cm²', `Diện tích xung quanh = (cạnh x cạnh) x 4.\nSxq = (${edge} x ${edge}) x 4 = ${sqxq} cm².`));
+            const s = edge * edge * 5;
+            qs.push(createQuestion(`Người ta làm một cái hộp không có nắp bằng bìa cứng dạng hình lập phương có cạnh ${edge}dm. Diện tích bìa cần dùng là:`, s, 'int', 'dm²', `Hộp không có nắp nên chỉ có 5 mặt.\nDiện tích bìa cần dùng = (cạnh x cạnh) x 5.\nS = (${edge} x ${edge}) x 5 = ${s} dm².`));
         } else if (subtype === 2) { // Hình Lập phương - Stp
             const edge = getRandomInt(2, 6);
             const stp = edge * edge * 6;
-            qs.push(createQuestion(`Diện tích toàn phần của một hộp quà hình lập phương cạnh ${edge}cm là:`, stp, 'int', 'cm²', `Diện tích toàn phần = (cạnh x cạnh) x 6.\nStp = (${edge} x ${edge}) x 6 = ${stp} cm².`));
+            qs.push(createQuestion(`Diện tích toàn phần của một khối gỗ hình lập phương cạnh ${edge}cm là:`, stp, 'int', 'cm²', `Diện tích toàn phần = (cạnh x cạnh) x 6.\nStp = (${edge} x ${edge}) x 6 = ${stp} cm².`));
         } else if (subtype === 3) { // Hình Lập phương - V
             const edge = getRandomInt(2, 6);
             const volume = edge * edge * edge;
-            qs.push(createQuestion(`Thể tích của khối rubik hình lập phương có cạnh ${edge}cm là:`, volume, 'int', 'cm³', `Thể tích hình lập phương = cạnh x cạnh x cạnh.\nV = ${edge} x ${edge} x ${edge} = ${volume} cm³.`));
-        } else if (subtype === 4) { // Hộp chữ nhật - Sxq
+            qs.push(createQuestion(`Thể tích của khối dạng hình lập phương có cạnh ${edge}cm là:`, volume, 'int', 'cm³', `Thể tích hình lập phương = cạnh x cạnh x cạnh.\nV = ${edge} x ${edge} x ${edge} = ${volume} cm³.`));
+        } else if (subtype === 4) { // Hộp chữ nhật - Bể không nắp
             const l = getRandomInt(5, 10);
             const w = getRandomInt(3, 5);
             const h = getRandomInt(4, 8);
             const sxq = (l + w) * 2 * h;
-            qs.push(createQuestion(`Một hộp giấy hình hộp chữ nhật dài ${l}cm, rộng ${w}cm, cao ${h}cm. Diện tích xung quanh của hộp là:`, sxq, 'int', 'cm²', `Diện tích xung quanh = (dài + rộng) x 2 x cao.\nSxq = (${l} + ${w}) x 2 x ${h} = ${sxq} cm².`));
-        } else if (subtype === 5) { // Hộp chữ nhật - Stp
-            const l = getRandomInt(5, 10);
-            const w = getRandomInt(3, 5);
-            const h = getRandomInt(4, 8);
+            const snk = sxq + l * w;
+            qs.push(createQuestion(`Một chiếc bể kính nuôi cá (không có nắp) dạng hình hộp chữ nhật dài ${l}dm, rộng ${w}dm, cao ${h}dm. Diện tích kính dùng làm bể là:`, snk, 'int', 'dm²', `Bể không nắp nên chỉ lấy 1 mặt đáy.\nDiện tích kính = Sxq + Diện tích 1 đáy = (dài + rộng) x 2 x cao + (dài x rộng).\nS = (${l} + ${w}) x 2 x ${h} + (${l} x ${w}) = ${sxq} + ${l * w} = ${snk} dm².`));
+        } else if (subtype === 5) { // Hộp chữ nhật - Quét vôi
+            const l = getRandomInt(6, 12);
+            const w = getRandomInt(4, 8);
+            const h = getRandomInt(3, 5);
+            const door = getRandomInt(5, 10);
             const sxq = (l + w) * 2 * h;
-            const stp = sxq + l * w * 2;
-            qs.push(createQuestion(`Một thùng bìa hình hộp chữ nhật có nắp dài ${l}dm, rộng ${w}dm, cao ${h}dm. Diện tích toàn phần của thùng là:`, stp, 'int', 'dm²', `Diện tích toàn phần = Sxq + Diện tích 2 đáy = (dài + rộng) x 2 x cao + (dài x rộng) x 2.\nStp = (${l} + ${w}) x 2 x ${h} + (${l} x ${w}) x 2 = ${sxq} + ${l * w * 2} = ${stp} dm².`));
+            const ceiling = l * w;
+            const stp = sxq + ceiling - door;
+            qs.push(createQuestion(`Người ta quét vôi bên trong một căn phòng dạng hình hộp chữ nhật có dài ${l}m, rộng ${w}m, cao ${h}m. Bờ mặt quét vôi gồm 4 bức tường và trần nhà. Biết tổng diện tích các cửa là ${door}m². Diện tích cần quét vôi là:`, stp, 'int', 'm²', `Diện tích 4 bức tường (Sxq) = (${l} + ${w}) x 2 x ${h} = ${sxq} m².\nDiện tích trần nhà = ${l} x ${w} = ${ceiling} m².\nDiện tích quét vôi = Sxq + Trần - Cửa = ${sxq} + ${ceiling} - ${door} = ${stp} m².`));
         } else { // Hộp chữ nhật - V
             const l = getRandomInt(5, 10);
             const w = getRandomInt(3, 5);
             const h = getRandomInt(2, 4);
             const volume = l * w * h;
-            qs.push(createQuestion(`Một bể cá hình hộp chữ nhật dài ${l}dm, rộng ${w}dm, cao ${h}dm. Thể tích bể là:`, volume, 'int', 'dm³', `Thể tích hình hộp chữ nhật = chiều dài x chiều rộng x chiều cao.\nV = ${l} x ${w} x ${h} = ${volume} dm³.`));
+            qs.push(createQuestion(`Một khối hình hộp chữ nhật dài ${l}dm, rộng ${w}dm, cao ${h}dm. Thể tích hình hộp đó là:`, volume, 'int', 'dm³', `Thể tích hình hộp chữ nhật = chiều dài x chiều rộng x chiều cao.\nV = ${l} x ${w} x ${h} = ${volume} dm³.`));
         }
     }
     return shuffleArray(qs);
@@ -785,11 +889,17 @@ const QuizView = ({ questions, title, onRetry }: { questions: Question[], title:
                     alignItems: 'center', 
                     padding: '15px', 
                     borderRadius: '15px',
-                    border: userAnswers[q.id] === optIdx ? '3px solid #0ea5e9' : '3px solid #cbd5e1',
+                    border: submitted 
+                      ? (optIdx === q.correct ? '3px solid #22c55e' : (userAnswers[q.id] === optIdx ? '3px solid #ef4444' : '3px solid #cbd5e1'))
+                      : (userAnswers[q.id] === optIdx ? '3px solid #0ea5e9' : '3px solid #cbd5e1'),
                     cursor: submitted ? 'default' : 'pointer',
-                    background: userAnswers[q.id] === optIdx ? '#e0f2fe' : 'white',
-                    fontWeight: userAnswers[q.id] === optIdx ? '900' : '600',
-                    color: userAnswers[q.id] === optIdx ? '#0369a1' : '#475569',
+                    background: submitted
+                      ? (optIdx === q.correct ? '#dcfce7' : (userAnswers[q.id] === optIdx ? '#fee2e2' : 'white'))
+                      : (userAnswers[q.id] === optIdx ? '#e0f2fe' : 'white'),
+                    fontWeight: (submitted && optIdx === q.correct) || (!submitted && userAnswers[q.id] === optIdx) ? '900' : '600',
+                    color: submitted
+                      ? (optIdx === q.correct ? '#166534' : (userAnswers[q.id] === optIdx ? '#991b1b' : '#475569'))
+                      : (userAnswers[q.id] === optIdx ? '#0369a1' : '#475569'),
                     fontSize: '1.2rem',
                     transition: 'all 0.2s',
                     boxShadow: !submitted ? 'none' : 'none',
@@ -801,9 +911,15 @@ const QuizView = ({ questions, title, onRetry }: { questions: Question[], title:
                     checked={userAnswers[q.id] === optIdx} 
                     onChange={() => handleSelect(q.id, optIdx)}
                     disabled={submitted}
-                    style={{ width: '25px', height: '25px', marginRight: '15px', accentColor: '#0ea5e9' }}
+                    style={{ width: '25px', height: '25px', marginRight: '15px', accentColor: submitted ? (optIdx === q.correct ? '#22c55e' : '#ef4444') : '#0ea5e9' }}
                   />
                   <span>{opt}</span>
+                  {submitted && optIdx === q.correct && (
+                    <span style={{ marginLeft: 'auto', color: '#166534', fontWeight: 'bold' }}>✓</span>
+                  )}
+                  {submitted && userAnswers[q.id] === optIdx && optIdx !== q.correct && (
+                    <span style={{ marginLeft: 'auto', color: '#991b1b', fontWeight: 'bold' }}>✗</span>
+                  )}
                 </label>
               ))}
             </div>
@@ -913,9 +1029,20 @@ const App = () => {
 
   const handleStartQuiz = (chapterId: string) => {
     // Gọi hàm sinh đề ngẫu nhiên từ Generators
-    if (Generators[chapterId as keyof typeof Generators]) {
-      const newQuestions = Generators[chapterId as keyof typeof Generators]();
-      setQuizQuestions(newQuestions);
+    const genFn = Generators[chapterId as keyof typeof Generators];
+    if (genFn) {
+      const uniqueQs = new Map<string, Question>();
+      let attempts = 0;
+      while (uniqueQs.size < 10 && attempts < 50) {
+        const batch = genFn();
+        batch.forEach(q => {
+          if (!uniqueQs.has(q.question) && uniqueQs.size < 10) {
+            uniqueQs.set(q.question, q);
+          }
+        });
+        attempts++;
+      }
+      setQuizQuestions(Array.from(uniqueQs.values()));
       setViewMode('quiz');
       window.scrollTo(0, 0);
     }
