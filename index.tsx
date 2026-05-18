@@ -213,7 +213,7 @@ const Generators = {
             { text: "Hai mươi lăm phẩy mười lăm", val: 25.15, read: "Hai mươi lăm phẩy mười lăm" },
             { text: "Không phẩy bảy mươi lăm", val: 0.75, read: "Không phẩy bảy mươi lăm" },
             { text: "Mười hai phẩy không ba", val: 12.03, read: "Mười hai phẩy không ba" },
-            { text: "Năm phẩy ba trăm mười tư", val: 5.314, read: "Năm phẩy ba trăm mười tư" }
+            { text: "Năm phẩy ba trăm mười bốn", val: 5.314, read: "Năm phẩy ba trăm mười bốn" }
           ];
           const item = getRandomItem(numList);
           if (isWrite) {
@@ -498,7 +498,7 @@ const Generators = {
             const sxq = (l + w) * 2 * h;
             const ceiling = l * w;
             const stp = sxq + ceiling - door;
-            qs.push(createQuestion(`Người ta quét vôi bên trong một căn phòng dạng hình hộp chữ nhật có dài ${l}m, rộng ${w}m, cao ${h}m. Bờ mặt quét vôi gồm 4 bức tường và trần nhà. Biết tổng diện tích các cửa là ${door}m². Diện tích cần quét vôi là:`, stp, 'int', 'm²', `Diện tích 4 bức tường (Sxq) = (${l} + ${w}) x 2 x ${h} = ${sxq} m².\nDiện tích trần nhà = ${l} x ${w} = ${ceiling} m².\nDiện tích quét vôi = Sxq + Trần - Cửa = ${sxq} + ${ceiling} - ${door} = ${stp} m².`));
+            qs.push(createQuestion(`Người ta quét vôi bên trong một căn phòng dạng hình hộp chữ nhật có dài ${l}m, rộng ${w}m, cao ${h}m. Bề mặt quét vôi gồm 4 bức tường và trần nhà. Biết tổng diện tích các cửa là ${door}m². Diện tích cần quét vôi là:`, stp, 'int', 'm²', `Diện tích 4 bức tường (Sxq) = (${l} + ${w}) x 2 x ${h} = ${sxq} m².\nDiện tích trần nhà = ${l} x ${w} = ${ceiling} m².\nDiện tích quét vôi = Sxq + Trần - Cửa = ${sxq} + ${ceiling} - ${door} = ${stp} m².`));
         } else { // Hộp chữ nhật - V
             const l = getRandomInt(5, 10);
             const w = getRandomInt(3, 5);
